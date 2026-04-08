@@ -121,10 +121,7 @@ func tick():
 
 
 func interpolate_position(fraction: float):
-	if current_state == State.MOVING:
-		global_position = visual_from.lerp(visual_to, clampf(fraction, 0.0, 1.0))
-	else:
-		global_position = visual_to
+	global_position = visual_from.lerp(visual_to, clampf(fraction, 0.0, 1.0))
 
 
 # --- State transitions ---
@@ -183,8 +180,9 @@ func _tick_move():
 	grid_coord = next_cell
 	visual_to = grid_manager.grid_to_world(grid_coord)
 
-	# Don't call _arrive_at_target here — let this tick's interpolation play out fully.
-	# The next tick will see move_path.is_empty() and arrive cleanly.
+	# If path exhausted, we've arrived.
+	if move_path.is_empty():
+		_arrive_at_target()
 
 
 func _arrive_at_target():
