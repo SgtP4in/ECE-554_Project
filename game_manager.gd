@@ -300,7 +300,12 @@ func _finish_generation():
 	var accepted := false
 	var reject_reason := ""
 
-	if best_weights.is_empty():
+	# --- Elitism Backstop ---
+	if alive > best_alive:
+		if alive > 75: # Do not allow elitism to bias results too much. One "lucky round" should not make a false positive
+			alive = 75
+		best_alive = alive
+		best_population = population.duplicate(true)
 		accepted = true
 	elif gen_best_fitness <= best_fitness_ever:
 		reject_reason = "No improvement (%.4f <= %.4f)" % [gen_best_fitness, best_fitness_ever]
